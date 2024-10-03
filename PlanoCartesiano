@@ -1,0 +1,71 @@
+package org.example;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+public class PlanoCartesiano extends JPanel {
+
+    private Funcion funcion;
+    private JRadioButton mostrarGradosButton;
+
+    public PlanoCartesiano() {
+        this.funcion = new Funcion();
+
+        // Crear botón de opción
+        mostrarGradosButton = new JRadioButton("Mostrar grados guardados");
+        mostrarGradosButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mostrarGradosButton.isSelected()) {
+                    mostrarGrados();
+                }
+            }
+        });
+
+        // Agregar el botón a la interfaz
+        this.add(mostrarGradosButton);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Dibujar plano cartesiano
+        g.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2); // Eje X
+        g.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());  // Eje Y
+
+        // Dibujar los puntos basados en sen(2*grados)
+        for (int grados = 0; grados <= 360; grados += 45) {
+            double resultado = funcion.resolver("sin(2 * theta)", grados);
+            int x = (int) (getWidth() / 2 + grados); // Escalar en X
+            int y = (int) (getHeight() / 2 - resultado * 100); // Escalar en Y
+            g.fillOval(x, y, 5, 5); // Dibujar un punto
+        }
+    }
+
+    // Método para mostrar los grados guardados en una ventana emergente
+    private void mostrarGrados() {
+        ArrayList<Integer> gradosGuardados = funcion.getGradosGuardados();
+        StringBuilder gradosText = new StringBuilder("Grados guardados:\n");
+
+        for (Integer grado : gradosGuardados) {
+            gradosText.append(grado).append("°\n");
+        }
+
+        JOptionPane.showMessageDialog(this, gradosText.toString(), "Grados Guardados", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Método main para ejecutar la aplicación
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Plano Cartesiano con Función y Grados Guardados");
+        PlanoCartesiano panel = new PlanoCartesiano();
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 600);
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+}
